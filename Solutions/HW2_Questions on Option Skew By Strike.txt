@@ -1,0 +1,80 @@
+1) What happens if you set the minimum solver volatility too high, or the maximum too low?
+
+If it's too wide:
+- convergence may require several steps and therefore would be slower
+- if the volatility is unrealistically large, the call tends to just mirror the underlying and put values tend to zero, resulting in flattening of the curve causing numerical instability.
+
+If it's too narrow:
+- you may not find the true root and the iterations may never converge to the true price
+
+
+
+
+2) Some option market data presented here just never gives a decent answer, and we get big errors.  Why?
+
+In general, far ITM and far OTM option prices are not reliable and the options also have very low vega.
+
+When options are deep ITM options the price should be very close to the present value today of the underlying-forward payoff. 
+
+For call options this is:
+Underlying * exp(-DividendYield * TimeToExpiration) - Strike * exp(-RiskFreeRate * TimeToExpiration)
+
+For a put options this is:
+Strike * exp(-RiskFreeRate * TimeToExpiration) - Underlying * exp(-DividendYield * TimeToExpiration)
+
+The quoted mid prices for some options are lower than this present value and so are likely not good quotes e.g. the calls with strike 297.5 302.5 or put with strike 372.5. The errors with our bisection are large for these options as a consequence.
+
+
+
+
+3) Describe what happens when we force the underlying to the "wrong" price
+
+The price may be 'wrong' due to stale data, incorrect currency mapping, bad security mapping, human error in data entry, etc. 
+If you have the wrong underlying price some options will may be priced belong the intrinsic value. The model will try to explain wrong prices by distorting the volatility and in extreme cases may not even converge.
+
+
+
+4) Describe what happens if we change the risk-free rate to a huge number, over 100%
+
+When you have extreme risk-free rates, the calls are close to full forward value and the calls will be far ITM while the puts lose nearly all value. At these levels, the implied volatility estimates become unreliable with the options having low vega. The solver will try to match these distorted theoretical prices to observed market prices.
+
+
+
+
+5) Imagine you have put this spreadsheet together for coworkers.  Name some improvements you would make to its stability or presentation so that they are not likely to be disturbed by errors or weird values.
+
+An incomplete list of potential improvements is below:
+- cell protection to avoid accidental overwrites for non-input cells
+- add error handling to formula in case we have bad market data and syntax highlighting for missing parameters
+- add conditional highlighting or something visual like that to flag unreliable or bad market data (e.g. if mid-price is less than the option's intrinsic value)
+- add plots of the implied volatility so that users can visualize the data and also quickly spot anomalies
+- create reusable functions with Excel lambdas or VBA to avoid copy-paste errors with formulas
+
+
+
+
+6) The instructors' grading rubric of this spreadsheet has the Black-Scholes formula being computed in, e.g. cells L5 and R5.  Why is computing the formula in these cells not actually necessary?
+
+This question was intended to refer to the cells that compute the BS price for the min & max volatility chosen for a given iteration. This is not needed as we only care about computing the price for the test (mid point) volatility. This is then compared to the market price to determine how to set the range for the next iteration.
+
+
+
+
+7) What other computational efficiency improvements could be made to this spreadsheet?
+
+An incomplete list of potential improvements is below:
+- don't compute the prices unless needed e.g. price for lower & upper ranges of volatility
+- add a halting condition based on a desired tolerance instead of always iterating for a fixed number of times
+- instead of using a simple average as the test volatility use something like secant method, Newton's method or Brent's method for faster convergence
+
+
+
+
+8) Aside from the 36 fit metrics presented here, what might you add to this spreadsheet?
+ 
+An incomplete list of potential things to add:
+- counts of market data that are outside of intrinsic or no-arb ranges for options (indicative of stale or unreliable market data)
+- metrics like std dev of error, RMSE
+- plot the distribution of the errors to visualize outliers
+- plots of the implied volatility smile
+
