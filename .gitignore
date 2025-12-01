@@ -202,3 +202,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Generated output files from Jupyter notebooks
+optimization/convergence_comparison.png
+optimization/model_comparison.png
+optimization/part1_fits.png
+
