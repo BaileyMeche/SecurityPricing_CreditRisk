@@ -844,7 +844,7 @@ def gauss_newton(R: np.ndarray, max_iter: int = 50, tol: float = 1e-6,
         
         J = rank1_jacobian(params, R)
         
-        # Gauss-Newton step: (J^T J + λI)^{-1} J^T r
+        # Gauss-Newton step: (J^T J + reg*I)^{-1} J^T r
         JTJ = J.T @ J
         JTr = J.T @ r
         
